@@ -31,8 +31,22 @@ app.use(express.static(public_dir));
 // Respond with list of codes and their corresponding incident type
 app.get('/codes', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-    
-    res.status(200).type('json').send({});
+    let codeList = url.searchParams.get('code');
+    console.log(codeList);
+    let sqlQuery = 'SELECT * From Codes ORDER BY code';
+    if(codeList != null){
+        sqlQuery = 'SELECT * From Codes WHERE code IN ('+ codeList +') ORDER BY code'
+    }
+    console.log(sqlQuery);
+    db.all(sqlQuery,[], (err,rows) => {
+        if (err) {
+            res.status(404).type('plain');
+            res.write('cannot read from database');
+            res.end();
+        }else{
+            res.status(200).type('json').send(rows);
+        }
+    });
 });
 
 // REST API: GET /neighborhoods
