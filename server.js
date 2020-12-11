@@ -43,12 +43,73 @@ app.get('/neighborhoods', (req, res) => {
     res.status(200).type('json').send({});
 });
 
+
 // REST API: GET/incidents
 // Respond with list of crime incidents
+//Return JSON object with list of crime incidents (ordered by date/time). Note date and time should be separate fields.
 app.get('/incidents', (req, res) => {
     let url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
 
-    res.status(200).type('json').send({});
+    let start_date = url.searchParams.get('start_date');
+    let end_date = url.searchParams.get('end_date');
+    let codes = url.searchParams.get('code');
+    let grids = url.searchParams.get('grid');
+    let neighborhoods =  url.searchParams.get('neighborhood');
+    limit = parseInt(url.searchParams.get('limit'));
+
+    if(start_date == null){
+        start_date = "2014-08-14T00:00:00";
+    }else {
+       start_date += "T00:00:00";
+    }
+
+    if(end_date == null){
+        end_date = "2020-11-26T24:59:59";
+    }else {
+        end_date += "T24:59:59";
+    }
+
+    if(neighborhoods == null){
+        neighborhoods = "SELECT distinct neighborhood_number FROM Incidents";
+    }
+    
+    if(codes == null){
+        codes = "SELECT distinct code FROM Incidents";
+    }
+
+    if(grids == null){
+        grids = "SELECT distinct police_grid FROM Incidents";
+    }
+
+   if(Number.isNaN(limit)){
+       limit = 1000;
+    }
+
+    let query = "SELECT * FROM Incidents WHERE date_time > '"+start_date+"' AND date_time < '"+end_date+"' AND neighborhood_number in ("+neighborhoods+") AND code IN ("+codes+") AND police_grid IN ("+grids+") GROUP BY date_time LIMIT "+limit;
+
+    Promise.all([databaseSelect(query)]).then((values)=>{
+        let split;
+        let mappedResults = [];
+        let value = values[0];
+        for(let i = 0; i < value.length; i++){
+            split = String(value[i].date_time).split("T");
+            let mappedRes = {
+                case_number: value[i].case_number,
+                date: split[0],
+                time: split[1],
+                code: value[i].case_number,
+                incident: value[i].incident,
+                police_grid: value[i].police_grid,
+                neighborhood_number: value[i].neighborhood_number,
+                block: value[i].block
+            };
+            mappedResults.push(mappedRes);
+        }
+
+        res.status(200).type('json').send(mappedResults);
+    }).catch((err) => {
+        console.error(error.message);
+    });
 });
 
 // REST API: PUT /new-incident
