@@ -29,6 +29,14 @@
     <!-- Main app -->
     <div id="app">
         <div id="leafletmap"></div>
+
+        <input v-model="input">
+        <p>{{input}}</p>
+        <p>format rules: </p>
+        <button @click=sendInput>GO</button>
+
+        
+
     </div>
 </body>
 </html>
