@@ -6,3 +6,56 @@
     width: 800px;  /* feel free to change this! */
     height: 600px; /* feel free to change this! */
 }
+
+#incidentTable {
+    margin-top: .5rem;
+    color: white;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    background-color: rgb(169, 216, 169);
+}
+  
+#incidentTable td, #incidentTable th {
+    border: .2rem solid #ddd;
+    padding: .5rem;
+}
+#incidentTable th {
+    background-color: rgb(129, 129, 129);
+}
+
+.violent {
+    background-color: rgb(255, 103, 103);
+}
+
+.other {
+    background-color: rgb(152, 152, 252);
+}
+
+.square {
+    margin: .5rem;
+    height: 2.5rem;
+    width: 2.5rem;
+    flex: 1;
+    text-align: center;
+    color: white;
+}
+
+#s1 {
+    background-color: rgb(255, 103, 103);
+}
+
+#s2 {
+    background-color: rgb(169, 216, 169);
+}
+
+#s3 {
+    background-color: rgb(152, 152, 252);
+}
+
+#legend {
+    margin: .5rem;
+    display: flex;
+}
+

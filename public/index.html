@@ -37,6 +37,16 @@
 
         
 
+        <div id="legend">
+            <div class="square" id="s1">Violent Crimes</div> 
+            <div class="square" id="s2">Property Crimes</div>
+            <div class="square" id="s3">Other Crimes</div>
+        </div>
+
+        <table id = "incidentTable">
+            <tr><th>Case Number</th><th>Date</th><th>Time</th><th>Incident Type</th><th>Incident</th><th>Police Grid</th><th>Neighborhood Name</th><th>Block</th></tr>
+            <tr v-for="item in incidentResults" v-bind:class="{'violent': app.codeResults[item.code][1], 'other': app.codeResults[item.code][2]}"><td>{{item.case_number}}</td><td>{{item.date}}</td><td>{{item.time}}</td><td>{{app.codeResults[item.code][0]}}</td><td>{{item.incident}}</td><td>{{item.police_grid}}</td><td>{{neighborhoodCounts[item.neighborhood_number].name}}</td><td>{{item.block}}</td></tr>
+        </table>
     </div>
 </body>
 </html>
