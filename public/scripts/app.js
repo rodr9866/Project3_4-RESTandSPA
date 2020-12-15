@@ -1,5 +1,6 @@
 let app;
 let map;
+let neighborhoodCounts = {};
 let neighborhood_markers = 
 [
     {location: [44.942068, -93.020521], marker: null},
@@ -38,28 +39,86 @@ function init() {
                     nw: {lat: 45.008206, lng: -93.217977},
                     se: {lat: 44.883658, lng: -92.993787}
                 }
-            }
+            },
+            codeResults: {},
+            neighborhoodResults: {},
+            incidentResults: []
         }
     });
 
-    map = L.map('leafletmap').setView([app.map.center.lat, app.map.center.lng], app.map.zoom);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        minZoom: 11,
-        maxZoom: 18
-    }).addTo(map);
-    map.setMaxBounds([[44.883658, -93.217977], [45.008206, -92.993787]]);
-    
-    let district_boundary = new L.geoJson();
-    district_boundary.addTo(map);
-
-    getJSON('data/StPaulDistrictCouncil.geojson').then((result) => {
-        // St. Paul GeoJSON
-        $(result.features).each(function(key, value) {
-            district_boundary.addData(value);
+    getCodes();
+    getNeighborhoods().then(() =>{
+        getIncidents().then(() => {
+            map = L.map('leafletmap').setView([app.map.center.lat, app.map.center.lng], app.map.zoom);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                minZoom: 11,
+                maxZoom: 18
+            }).addTo(map);
+        
+            map.setMaxBounds([[44.883658, -93.217977], [45.008206, -92.993787]]);
+        }).then(() => {
+            addNeighborhoodPopups();
+        
+            let district_boundary = new L.geoJson();
+            district_boundary.addTo(map);
+        
+            getJSON('data/StPaulDistrictCouncil.geojson').then((result) => {
+                // St. Paul GeoJSON
+                $(result.features).each(function(key, value) {
+                    district_boundary.addData(value);
+                });
+            }).catch((error) => {
+                console.log('Error:', error);
+            });
         });
-    }).catch((error) => {
-        console.log('Error:', error);
+    });
+}
+
+function addNeighborhoodPopups(){
+    for(let i = 1; i <= 17; i++){
+        L.marker([neighborhood_markers[i-1].location[0], neighborhood_markers[i-1].location[1]]).addTo(map).bindPopup(neighborhoodCounts[i].name+' Crime Count: '+neighborhoodCounts[i].count).openPopup();
+    }
+}
+
+function getNeighborhoods() {
+    let url = 'http://localhost:8000/neighborhoods';
+    neighborhoodCounts = {};
+    return getJSON(url).then((result) => {
+        for(let i = 0; i < result.length; i++){
+            neighborhoodCounts[result[i].neighborhood_number] = {name: result[i].neighborhood_name, count: 0};
+        }
+    });
+}
+
+function getCodes(){
+    let url = 'http://localhost:8000/codes';
+    app.codeResults = [];
+    return getJSON(url).then((result) => {
+        for(let i = 0; i < result.length; i++){
+            let code = result[i].code;
+            let arr = [];
+            arr.push(result[i].incident_type);
+            if((code >= 1800 && code <= 9959) || (code == 614)){
+                arr.push(false); //violent crime = false
+                arr.push(true); //other crime = true
+            }else if((code >= 110 && code <= 220) || (code >= 400 && code <= 453) || (code >= 810 && code <= 982)){
+                arr.push(true); //violent crime = true
+                arr.push(false); //other crime = false
+            }
+            app.codeResults[code] = arr;
+        }
+    });
+}
+
+function getIncidents(){
+    let url = 'http://localhost:8000/incidents?';
+    return getJSON(url).then((result) => {
+        app.incidentResults = [];
+        for(let i = result.length-1; i >= 0; i--){ //adding most recent incidents first
+            app.incidentResults.push(result[i]);
+            neighborhoodCounts[result[i].neighborhood_number].count++; //increment crime count for neighborhood
+        }
     });
 }
 
