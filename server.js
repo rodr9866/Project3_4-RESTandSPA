@@ -115,7 +115,7 @@ app.get('/incidents', (req, res) => {
                 case_number: value[i].case_number,
                 date: split[0],
                 time: split[1],
-                code: value[i].case_number,
+                code: value[i].code,
                 incident: value[i].incident,
                 police_grid: value[i].police_grid,
                 neighborhood_number: value[i].neighborhood_number,
