@@ -56,6 +56,10 @@ function init() {
         methods: {
             sendInput: function(){
                 getLatLong(this.input);
+            },
+            sendRow: function(row){
+                addMarkerForRow(row);
+
             }
         }
     });
@@ -333,11 +337,46 @@ function getLatLong(input){
         //address was inputted
         splitInput[0] = input;
         let request = {
-            url: "https://nominatim.openstreetmap.org/search?q=" + input + "&format=json&addressdetails=1",
+            url: "https://nominatim.openstreetmap.org/search?format=json&q=" + input.replace(" ", "%20") + "&addressdetails=1",
             dataType: "json",
             success: panToLocation
         };
         $.ajax(request);
     }
 }   
+
+function replaceAddressX(address){
+    if(address.length > 0 && address.match(/^\d/)){
+        //regex to check if starts with a number
+        addressSplit = address.split(" ");
+        address[0] = address[0].replace("X", "0");
+        address = addressSplit.join(" ");
+    }
+    return address;
+}
+
+function addMarkerForRow(row){
+    let address = replaceAddressX(row.block);
+    var greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+    let request = {
+        url: "https://nominatim.openstreetmap.org/search?format=json&q=" + (address + ", Saint Paul, MN").replace(" ", "%20") + "&addressdetails=1",
+        dataType: "json",
+        success: function(data){
+            console.log(data);
+            if(data != null){
+                let latLong = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                L.marker(latLong, {icon: greenIcon}).addTo(map).bindPopup("Date: " + row.date + "\nTime: " + row.time + "\nIncident: "+ row.incident).openPopup();
+            }
+        }
+    };
+    $.ajax(request);
+}
 

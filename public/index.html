@@ -95,7 +95,7 @@
                     <th>Neighborhood Name</th>
                     <th>Block</th>
                 </tr>
-                <tr v-for="item in incidentResults" v-bind:class="{'violent': app.codeResults[item.code][1], 'other': app.codeResults[item.code][2]}">
+                <tr v-for="item in incidentResults" v-bind:class="{'violent': app.codeResults[item.code][1], 'other': app.codeResults[item.code][2]}" @click="sendRow(item)">
                     <td>{{item.case_number}}</td>
                     <td>{{item.date}}</td>
                     <td>{{item.time}}</td>
