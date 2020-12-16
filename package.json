@@ -3,16 +3,26 @@
     "version": "0.0.0",
     "description": "RESTful Web Server and Single Page Application",
     "author": {
-        "name": "",
-        "email": ""
-    },
+        "name": "Ricky Rodriguez",
+        "email": "rodr9866@stthomas.edu"
+    },"contributors": [
+        {
+            "name": "Laura Post",
+            "email": "post3024@stthomas.edu"
+        },
+        {
+            "name": "Megan Rousslang",
+            "email": "rous8197@stthomas.edu"
+        }
+    ],
     "main": "server.js",
     "repository": {
         "type": "git",
-        "url": ""
+        "url": "https://github.com/rodr9866/Project3_4-RESTandSPA"
     },
     "dependencies": {
         "express": "^4.17.1",
-        "sqlite3": "^4.1.0"
+        "sqlite3": "^4.1.0",
+        "node": "^15.2.1"
     }
 }
