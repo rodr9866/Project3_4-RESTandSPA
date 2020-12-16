@@ -28,12 +28,14 @@
 <body onload="init()">
     <!-- Main app -->
     <div id="app">
+        <h1 class="title">St. Paul Crime Map</h1>
         <div id="leafletmap"></div>
 
-        <input v-model="input">
-        <p>{{input}}</p>
-        <p>format rules: </p>
-        <button @click=sendInput>GO</button>
+        <div id="inputBox">
+            <h1>Input a Location</h1>
+            <input v-model="input">
+            <button @click=sendInput>GO</button>
+        </div>
 
         <div id="legend">
             <div class="square" id="s1">Violent Crimes</div> 
@@ -42,8 +44,26 @@
         </div>
 
         <table id = "incidentTable">
-            <tr><th>Case Number</th><th>Date</th><th>Time</th><th>Incident Type</th><th>Incident</th><th>Police Grid</th><th>Neighborhood Name</th><th>Block</th></tr>
-            <tr v-for="item in incidentResults" v-bind:class="{'violent': app.codeResults[item.code][1], 'other': app.codeResults[item.code][2]}"><td>{{item.case_number}}</td><td>{{item.date}}</td><td>{{item.time}}</td><td>{{app.codeResults[item.code][0]}}</td><td>{{item.incident}}</td><td>{{item.police_grid}}</td><td>{{neighborhoodCounts[item.neighborhood_number].name}}</td><td>{{item.block}}</td></tr>
+            <tr>
+                <th>Case Number</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Incident Type</th>
+                <th>Incident</th>
+                <th>Police Grid</th>
+                <th>Neighborhood Name</th>
+                <th>Block</th>
+            </tr>
+            <tr v-for="item in incidentResults" v-bind:class="{'violent': app.codeResults[item.code][1], 'other': app.codeResults[item.code][2]}">
+                <td>{{item.case_number}}</td>
+                <td>{{item.date}}</td>
+                <td>{{item.time}}</td>
+                <td>{{app.codeResults[item.code][0]}}</td>
+                <td>{{item.incident}}</td>
+                <td>{{item.police_grid}}</td>
+                <td>{{neighborhoodCounts[item.neighborhood_number].name}}</td>
+                <td>{{item.block}}</td>
+            </tr>
         </table>
 
 

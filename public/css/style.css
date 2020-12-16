@@ -2,9 +2,27 @@
     margin: 0 auto;
 }
 
+.title {
+    text-align: center;
+    font-size: 2rem;
+    padding: 40px;
+}
+
 #leafletmap {
     width: 800px;  /* feel free to change this! */
     height: 600px; /* feel free to change this! */
+}
+
+#inputBox {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    padding: 50px;
+    text-align: center;
+}
+
+#inputBox h1 {
+    padding-bottom: 20px;
 }
 
 #incidentTable {
@@ -13,7 +31,9 @@
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
-    width: 100%;
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
     background-color: rgb(169, 216, 169);
 }
   
@@ -55,7 +75,8 @@
 }
 
 #legend {
-    margin: .5rem;
+    margin: .5rem auto;
     display: flex;
+    width: 95%;
 }
 
