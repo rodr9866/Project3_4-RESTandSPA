@@ -144,40 +144,39 @@ function getJSON(url) {
 }
 //MAYBE DELETE
 function panToLocation(data){
-    if(data == null){
-
+    console.log(data);
+    if(data != null){
+        let latLong = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        map.setZoom(16);
+        map.flyTo(latLong);
+        app.input = latLong.toString();
     }
-    let latLong = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-    map.setZoom(16);
-    map.flyTo(latLong);
-
 }
 
 function getLatLong(input){
-    /*
     let splitInput = [];
     if(input.includes(",")){
         splitInput = input.split(",");
         if(splitInput.length == 2 && !isNaN(parseFloat(splitInput[0])) && !isNaN(parseFloat(splitInput[1]))){
             //valid
             let latLong = splitInput.map(element => {
-                //return parseFloat(element);
+                return parseFloat(element);
             });
-            //return latLong;
+
+            //clamp
+            map.setZoom(16);
+            map.flyTo(latLong);
         }
         
     }else{
+        //address was inputted
         splitInput[0] = input;
-
+        let request = {
+            url: "https://nominatim.openstreetmap.org/search?q=" + input + "&format=json&addressdetails=1",
+            dataType: "json",
+            success: panToLocation
+        };
+        $.ajax(request);
     }
-    //address
-    */
-    let request = {
-        url: "https://nominatim.openstreetmap.org/search/" + input + "?format=json&addressdetails=1",
-        dataType: "json",
-        success: panToLocation
-    };
-    $.ajax(request);
-
 }   
 
