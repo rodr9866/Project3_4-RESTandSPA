@@ -43,15 +43,24 @@ function init() {
             input: "",
             codeResults: {},
             neighborhoodResults: {},
-            incidentResults: []
+            incidentResults: [],
+            incidentTypes: [],
+            incident_checkboxes: [],
+            neighborhood_checkboxes: [],
+            startDate: "",
+            endDate: "",
+            startTime: "",
+            endTime: "",
+            limit: null
         },
         methods: {
             sendInput: function(){
                 getLatLong(this.input);
-            },
+            }
         }
     });
 
+    getIncidentTypes();
     getCodes();
     getNeighborhoods().then(() =>{
         getIncidents().then(() => {
@@ -81,6 +90,153 @@ function init() {
     });
 }
 
+function applyFilters() {
+    params = "";
+    codes = [];
+    if(app.incident_checkboxes.length > 0) {
+        if(app.incident_checkboxes.includes("Murder")) {
+            codes.push(110);
+            codes.push(120);
+        }
+        if(app.incident_checkboxes.includes("Rape")) {
+            codes.push(210);
+            codes.push(220);
+        }
+        if(app.incident_checkboxes.includes("Robbery")) {
+            let i;
+            for(i = 300; i <= 374; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Aggravated Assault")) {
+            let i;
+            for(i = 400; i <= 453; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Burglary")) {
+            let i;
+            for(i = 500; i <= 566; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Theft")) {
+            let i;
+            for(i = 600; i <= 693; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Motor Vehicle Theft")) {
+            let i;
+            for(i = 700; i <= 722; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Assault")) {
+            codes.push(810);
+            codes.push(861);
+            codes.push(862);
+            codes.push(863);
+        }
+        if(app.incident_checkboxes.includes("Arson")) {
+            let i;
+            for(i = 900; i <= 982; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Property Damage")) {
+            let i;
+            for(i = 1400; i <= 1436; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Narcotics")) {
+            let i;
+            for(i = 1800; i <= 1885; i++) {
+                codes.push(i);
+            }
+        }
+        if(app.incident_checkboxes.includes("Weapons")) {
+            codes.push(2619);
+        }
+        if(app.incident_checkboxes.includes("Narcotics")) {
+            codes.push(9954);
+        }
+        if(app.incident_checkboxes.includes("Narcotics")) {
+            codes.push(9959);
+        }
+
+        params = params + "code=" + codes.join() + "&";
+    }
+
+    if(app.neighborhood_checkboxes.length > 0) {
+        params = params + "neighborhood=" + app.neighborhood_checkboxes.join() + "&";
+    }
+
+    start_datetime = "";
+    end_datetime = "";
+
+    if(app.startDate != "") {
+        start_datetime = app.startDate;
+        if(app.startTime != "") {
+            start_datetime = start_datetime + "T" + app.startTime + ":00";
+        }
+        else {
+            start_datetime += "T00:00:00";
+        }
+        params = params + "start_date=" + start_datetime + "&";
+    }
+    else if(app.startTime != "") {
+        start_datetime = "2014-08-14T" + app.startTime + ":00";
+        params = params + "start_date=" + start_datetime + "&";
+    }
+
+    if(app.endDate != "") {
+        end_datetime = app.endDate;
+        if(endTime != "") {
+            end_datetime = end_datetime + "T" + app.endTime + ":00";
+        }
+        else {
+            end_datetime += "T24:59:59";
+        }
+        params = params + "end_date=" + end_datetime + "&";
+    }
+    else if(app.endTime != "") {
+        end_datetime = "2020-11-26T" + app.endTime + ":00";
+        params = params + "end_date=" + end_datetime + "&";
+    }
+
+    if(app.limit != null) {
+        params = params + "limit=" + app.limit;
+    }
+
+    console.log(params);
+    if(params != "") {
+        getIncidents(params);
+    }
+
+}
+
+function getIncidentTypes() {
+    app.incidentTypes.push("Murder");
+    app.incidentTypes.push("Rape");
+    app.incidentTypes.push("Robbery");
+    app.incidentTypes.push("Aggravated Assault");
+    app.incidentTypes.push("Burglary");
+    app.incidentTypes.push("Theft");
+    app.incidentTypes.push("Motor Vehicle Theft");
+    app.incidentTypes.push("Assault");
+    app.incidentTypes.push("Arson");
+    app.incidentTypes.push("Property Damage");
+    app.incidentTypes.push("Narcotics");
+    app.incidentTypes.push("Weapons");
+    app.incidentTypes.push("Proactive Police Event");
+    app.incidentTypes.push("Community Engagement Event");
+    app.incidentTypes.push("Other");
+
+    console.log(app.incidentTypes);
+}
+
 function addNeighborhoodPopups(){
     for(let i = 1; i <= 17; i++){
         L.marker([neighborhood_markers[i-1].location[0], neighborhood_markers[i-1].location[1]]).addTo(map).bindPopup(neighborhoodCounts[i].name+' Crime Count: '+neighborhoodCounts[i].count).openPopup();
@@ -92,8 +248,9 @@ function getNeighborhoods() {
     neighborhoodCounts = {};
     return getJSON(url).then((result) => {
         for(let i = 0; i < result.length; i++){
-            neighborhoodCounts[result[i].neighborhood_number] = {name: result[i].neighborhood_name, count: 0};
+            neighborhoodCounts[result[i].neighborhood_number] = {name: result[i].neighborhood_name, count: 0, number: result[i].neighborhood_number};
         }
+        console.log(neighborhoodCounts);
     });
 }
 
@@ -114,11 +271,15 @@ function getCodes(){
             }
             app.codeResults[code] = arr;
         }
+        console.log(app.codeResults);
     });
 }
 
-function getIncidents(){
+function getIncidents(params){
     let url = 'http://localhost:8000/incidents?';
+    if(params != null) {
+        url = url + params;
+    }
     return getJSON(url).then((result) => {
         app.incidentResults = [];
         for(let i = result.length-1; i >= 0; i--){ //adding most recent incidents first

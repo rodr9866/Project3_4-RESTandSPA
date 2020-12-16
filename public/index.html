@@ -29,6 +29,7 @@
     <!-- Main app -->
     <div id="app">
         <h1 class="title">St. Paul Crime Map</h1>
+        
         <div id="leafletmap"></div>
 
         <div id="inputBox">
@@ -37,35 +38,75 @@
             <button @click=sendInput>GO</button>
         </div>
 
+        <div class="incidentFilter">
+            <h1 class="filterTitle">Filter by Incident Type:</h1>
+            <div v-for="incidentType in incidentTypes">
+                <input type="checkbox" v-bind:id="incidentType" v-bind:value="incidentType" v-model="incident_checkboxes">
+                <label for="incidentType">{{incidentType}}</label>
+            </div>
+        </div>
+
+        <div class="neighborhoodFilter">
+            <h1 class="filterTitle">Filter by Neighborhood:</h1>
+            <div v-for="neighborhood in neighborhoodCounts">
+                <input type="checkbox" v-bind:id="neighborhood.name" v-bind:value="neighborhood.number" v-model="neighborhood_checkboxes">
+                <label for="neighborhood.name">{{neighborhood.name}}</label>
+            </div>
+        </div>
+
+        <div class="dateTimeFilter">
+            <h1 class="filterTitle">Filter by Date Range:</h1>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" value="2014-08-26" min="2014-08-26" max="2020-12-31" v-model="startDate">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endState" value="2014-08-26" min="2014-08-26" max="2020-12-31" v-model="endDate">
+        
+            <br></br>
+
+            <h1 class="filterTitle">Filter by Time Range:</h1>
+            <label for="startTime">Start Time:</label>
+            <input type="time" id="startTime" value="00:00" min="00:00" max="23:59" v-model="startTime">
+            <label for="endTime">End Time:</label>
+            <input type="time" id="endTime" value="00:00" min="00:00" max="23:59" v-model="endTime">
+        </div>
+
+        <div class="limitFilter">
+            <h1 class="filterTitle">Enter Max Number of Incidents:</h1>
+            <input type="number" id="limit" min="0" max="1000" v-model="limit">
+        </div>
+
+        <input id="submitFilters" type="submit" value="Apply Filters" @click=applyFilters>
+
         <div id="legend">
             <div class="square" id="s1">Violent Crimes</div> 
             <div class="square" id="s2">Property Crimes</div>
             <div class="square" id="s3">Other Crimes</div>
         </div>
 
-        <table id = "incidentTable">
-            <tr>
-                <th>Case Number</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Incident Type</th>
-                <th>Incident</th>
-                <th>Police Grid</th>
-                <th>Neighborhood Name</th>
-                <th>Block</th>
-            </tr>
-            <tr v-for="item in incidentResults" v-bind:class="{'violent': app.codeResults[item.code][1], 'other': app.codeResults[item.code][2]}">
-                <td>{{item.case_number}}</td>
-                <td>{{item.date}}</td>
-                <td>{{item.time}}</td>
-                <td>{{app.codeResults[item.code][0]}}</td>
-                <td>{{item.incident}}</td>
-                <td>{{item.police_grid}}</td>
-                <td>{{neighborhoodCounts[item.neighborhood_number].name}}</td>
-                <td>{{item.block}}</td>
-            </tr>
-        </table>
-
+        <div class="scroll">
+            <table id = "incidentTable">
+                <tr>
+                    <th>Case Number</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Incident Type</th>
+                    <th>Incident</th>
+                    <th>Police Grid</th>
+                    <th>Neighborhood Name</th>
+                    <th>Block</th>
+                </tr>
+                <tr v-for="item in incidentResults" v-bind:class="{'violent': app.codeResults[item.code][1], 'other': app.codeResults[item.code][2]}">
+                    <td>{{item.case_number}}</td>
+                    <td>{{item.date}}</td>
+                    <td>{{item.time}}</td>
+                    <td>{{app.codeResults[item.code][0]}}</td>
+                    <td>{{item.incident}}</td>
+                    <td>{{item.police_grid}}</td>
+                    <td>{{neighborhoodCounts[item.neighborhood_number].name}}</td>
+                    <td>{{item.block}}</td>
+                </tr>
+            </table>
+        </div>
 
     </div>
 </body>

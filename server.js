@@ -77,14 +77,10 @@ app.get('/incidents', (req, res) => {
 
     if(start_date == null){
         start_date = "2014-08-14T00:00:00";
-    }else {
-       start_date += "T00:00:00";
     }
 
     if(end_date == null){
         end_date = "2020-11-26T24:59:59";
-    }else {
-        end_date += "T24:59:59";
     }
 
     if(neighborhoods == null){
