@@ -8,6 +8,31 @@
     padding: 40px;
 }
 
+.centerTitle, #members {
+    text-align: center;
+    padding: 20px;
+}
+
+video {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+ul {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+.subUl {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+}
+
 #leafletmap {
     width: 800px;  /* feel free to change this! */
     height: 600px; /* feel free to change this! */
@@ -23,6 +48,7 @@
 
 h1 {
     font-size: 1.5rem;
+    text-decoration: underline;
 }
 
 #inputBox h1 {
@@ -108,3 +134,22 @@ div.scroll{
     width: 95%;
 }
 
+#members {
+    width: 60%;
+}
+#members th {
+    font-size: 2rem;
+}
+
+#temp {
+    float: left;
+}
+
+#temp2 {
+    float: right;
+}
+
+a, a:visited {
+    text-decoration: none;
+    color: black;
+}
