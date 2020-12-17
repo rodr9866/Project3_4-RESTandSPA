@@ -243,17 +243,30 @@ function getIncidentTypes() {
 }
 
 function addNeighborhoodPopups(){
+    let maxLon = app.$data.map.bounds.se.lon
+    let minLon = app.$data.map.bounds.nw.lon
+    let maxLat = app.$data.map.bounds.nw.lat;
+    let minLat = app.$data.map.bounds.se.lat;
+
     for(let i = 1; i <= 17; i++){
-        L.marker([neighborhood_markers[i-1].location[0], neighborhood_markers[i-1].location[1]]).addTo(map).bindPopup(neighborhoodCounts[i].name+' Crime Count: '+neighborhoodCounts[i].count).openPopup();
+        let neighborhoodLat = neighborhood_markers[i-1].location[0];
+        let neighborhoodLon = neighborhood_markers[i-1].location[1];
+
+        if((neighborhoodLat < minLat || neighborhoodLat > maxLat) || (neighborhoodLon < minLon || neighborhoodLon > maxLon)){
+            neighborhood_markers[i-1].marker = null;
+        }else { //only add popup if in bounds of map
+            neighborhood_markers[i-1].marker = L.marker([neighborhood_markers[i-1].location[0], neighborhood_markers[i-1].location[1]]).addTo(map).bindPopup(neighborhoodCounts[i].name+' Crime Count: '+neighborhoodCounts[i].count).openPopup();
+        }
     }
 }
 
 function getNeighborhoods() {
+    //could add to {} and put onMap: T/F then in getIncidents if neighborhoodCounts[neighborhoodNum].onMap != T => don't push!
     let url = 'http://localhost:8000/neighborhoods';
     neighborhoodCounts = {};
     return getJSON(url).then((result) => {
         for(let i = 0; i < result.length; i++){
-            neighborhoodCounts[result[i].neighborhood_number] = {name: result[i].neighborhood_name, count: 0, number: result[i].neighborhood_number};
+            neighborhoodCounts[result[i].neighborhood_number] = {name: result[i].neighborhood_name, count: 0, number: result[i].neighborhood_number, onMap: false};
         }
         console.log(neighborhoodCounts);
     });
@@ -285,11 +298,35 @@ function getIncidents(params){
     if(params != null) {
         url = url + params;
     }
+
+    //only show crimes that occured in locations visible on map
+    let maxLon = app.$data.map.bounds.se.lon
+    let minLon = app.$data.map.bounds.nw.lon
+    let maxLat = app.$data.map.bounds.nw.lat;
+    let minLat = app.$data.map.bounds.se.lat;
+
+    for(let i = 1; i <= 17; i++){
+        let neighborhoodLat = neighborhood_markers[i-1].location[0];
+        let neighborhoodLon = neighborhood_markers[i-1].location[1];
+
+        if((neighborhoodLat < minLat || neighborhoodLat > maxLat) || (neighborhoodLon < minLon || neighborhoodLon > maxLon)){
+            neighborhood_markers[i-1].marker = null;
+            neighborhoodCounts[i].onMap = false;
+        }else { 
+            neighborhoodCounts[i].onMap = true;
+        }
+    }
+
     return getJSON(url).then((result) => {
+        let nw = [app.$data.map.bounds.nw.lat, app.$data.map.bounds.nw.lng];
+        let se = [app.$data.map.bounds.se.lat, app.$data.map.bounds.se.lng];
         app.incidentResults = [];
-        for(let i = result.length-1; i >= 0; i--){ //adding most recent incidents first
-            app.incidentResults.push(result[i]);
-            neighborhoodCounts[result[i].neighborhood_number].count++; //increment crime count for neighborhood
+
+        for(let i = 0; i < result.length; i++){ //adding most recent incidents first
+            if(neighborhoodCounts[result[i].neighborhood_number].onMap){
+                app.incidentResults.push(result[i]);
+                neighborhoodCounts[result[i].neighborhood_number].count++; //increment crime count for neighborhood
+            }
         }
     });
 }

@@ -99,25 +99,31 @@ app.get('/incidents', (req, res) => {
        limit = 1000;
     }
 
-    let query = "SELECT * FROM Incidents WHERE date_time > '"+start_date+"' AND date_time < '"+end_date+"' AND neighborhood_number in ("+neighborhoods+") AND code IN ("+codes+") AND police_grid IN ("+grids+") GROUP BY date_time LIMIT "+limit;
+    let query = "SELECT * FROM Incidents WHERE date_time >= '"+start_date+"' AND date_time <= '"+end_date+"' AND neighborhood_number in ("+neighborhoods+") AND code IN ("+codes+") AND police_grid IN ("+grids+") ORDER BY date_time desc LIMIT "+limit;
 
     Promise.all([databaseSelect(query)]).then((values)=>{
         let split;
+        let startSplit = String(start_date).split("T");
+        let endSplit = String(end_date).split("T");
+        let sTime = startSplit[1];
+        let eTime = endSplit[1];
         let mappedResults = [];
         let value = values[0];
         for(let i = 0; i < value.length; i++){
             split = String(value[i].date_time).split("T");
-            let mappedRes = {
-                case_number: value[i].case_number,
-                date: split[0],
-                time: split[1],
-                code: value[i].code,
-                incident: value[i].incident,
-                police_grid: value[i].police_grid,
-                neighborhood_number: value[i].neighborhood_number,
-                block: value[i].block
-            };
-            mappedResults.push(mappedRes);
+            if(!(split[1] < sTime || split[1] > eTime)){
+                let mappedRes = {
+                    case_number: value[i].case_number,
+                    date: split[0],
+                    time: split[1],
+                    code: value[i].code,
+                    incident: value[i].incident,
+                    police_grid: value[i].police_grid,
+                    neighborhood_number: value[i].neighborhood_number,
+                    block: value[i].block
+                };
+                mappedResults.push(mappedRes);
+            }
         }
 
         res.status(200).type('json').send(mappedResults);
