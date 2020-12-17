@@ -21,7 +21,8 @@ let neighborhood_markers =
     {location: [44.937705, -93.136997], marker: null},
     {location: [44.949203, -93.093739], marker: null}
 ];
-
+let markerID = 0;
+let incidentMarkers = {};
 function init() {
     let crime_url = 'http://localhost:8000';
 
@@ -58,6 +59,10 @@ function init() {
                 if (this.input != "") {
                     getLatLong(this.input);
                 }
+            },
+            sendRow: function(row){
+                addMarkerForRow(row);
+
             }
         }
     });
@@ -385,3 +390,49 @@ function getLatLong(input){
     };
     $.ajax(request);
 }   
+
+function replaceAddressX(address){
+    if(address.length > 0 && address.match(/^\d/)){
+        //regex to check if starts with a number
+        addressSplit = address.split(" ");
+        address[0] = address[0].replace("X", "0");
+        address = addressSplit.join(" ");
+    }
+    return address;
+}
+
+function addMarkerForRow(row){
+    let address = replaceAddressX(row.block);
+    var greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+    let request = {
+        url: "https://nominatim.openstreetmap.org/search?format=json&q=" + (address + ", Saint Paul, MN").replace(" ", "%20") + "&addressdetails=1",
+        dataType: "json",
+        success: function(data){
+            console.log(data);
+            if(data != null && data.length > 0){
+                let id = markerID;
+                markerID++;
+                let latLong = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                let thisMarker = L.marker(latLong, {icon: greenIcon}).addTo(map);
+                incidentMarkers[id] = thisMarker;
+                thisMarker.bindPopup("Date: " + row.date + "\nTime: " + row.time + "\nIncident: "+ row.incident + '<br/><button type="button" onclick="deleteMarker(' + id + ')">Click to Delete</button>').openPopup();
+            }
+        }
+    };
+    $.ajax(request);
+}
+
+function deleteMarker(id){
+    console.log("Deleting marker at" + id);
+    map.removeLayer(incidentMarkers[id]);
+    delete incidentMarkers[id];
+}
+
