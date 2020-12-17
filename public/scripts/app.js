@@ -21,7 +21,8 @@ let neighborhood_markers =
     {location: [44.937705, -93.136997], marker: null},
     {location: [44.949203, -93.093739], marker: null}
 ];
-
+let markerID = 0;
+let incidentMarkers = {};
 function init() {
     let crime_url = 'http://localhost:8000';
 
@@ -371,12 +372,22 @@ function addMarkerForRow(row){
         dataType: "json",
         success: function(data){
             console.log(data);
-            if(data != null){
+            if(data != null && data.length > 0){
+                let id = markerID;
+                markerID++;
                 let latLong = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-                L.marker(latLong, {icon: greenIcon}).addTo(map).bindPopup("Date: " + row.date + "\nTime: " + row.time + "\nIncident: "+ row.incident).openPopup();
+                let thisMarker = L.marker(latLong, {icon: greenIcon}).addTo(map);
+                incidentMarkers[id] = thisMarker;
+                thisMarker.bindPopup("Date: " + row.date + "\nTime: " + row.time + "\nIncident: "+ row.incident + '<br/><button type="button" onclick="deleteMarker(' + id + ')">Click to Delete</button>').openPopup();
             }
         }
     };
     $.ajax(request);
+}
+
+function deleteMarker(id){
+    console.log("Deleting marker at" + id);
+    map.removeLayer(incidentMarkers[id]);
+    delete incidentMarkers[id];
 }
 
