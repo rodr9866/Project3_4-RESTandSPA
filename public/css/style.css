@@ -2,6 +2,34 @@
     margin: 0 auto;
 }
 
+.menu {
+	background-color:lightgray;
+	overflow: hidden;
+}
+
+.menu a {
+	float: left;
+	color: black;
+	text-align: center;
+	padding: 10px;
+	width: 25%;
+	text-decoration: none;
+    font-size: 2rem;
+    border: 5px solid lightgray;
+}
+
+.menu a:hover {
+    background-color:  lightsteelblue;
+    color: black;
+    border: 5px solid white;
+}
+
+.menu a.active {
+	background-color:  lightsteelblue;
+    color: black;
+    border: 5px solid white;
+}
+
 .title {
     text-align: center;
     font-size: 2rem;
@@ -34,8 +62,9 @@ ul {
 }
 
 #leafletmap {
-    width: 800px;  /* feel free to change this! */
-    height: 600px; /* feel free to change this! */
+    width: 800px;
+    height: 600px;
+    border: 5px solid lightsteelblue;
 }
 
 #inputBox {
@@ -48,7 +77,6 @@ ul {
 
 h1 {
     font-size: 1.5rem;
-    text-decoration: underline;
 }
 
 #inputBox h1 {
@@ -64,6 +92,9 @@ h1 {
 #submitFilters {
     display: block;
     clear: left;
+    width: 10%;
+    padding: 10px;
+    margin-bottom: 20px;
 }
 
 .filterTitle {

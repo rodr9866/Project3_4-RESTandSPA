@@ -55,7 +55,9 @@ function init() {
         },
         methods: {
             sendInput: function(){
-                getLatLong(this.input);
+                if (this.input != "") {
+                    getLatLong(this.input);
+                }
             }
         }
     });
@@ -123,7 +125,9 @@ function applyFilters() {
         if(app.incident_checkboxes.includes("Theft")) {
             let i;
             for(i = 600; i <= 693; i++) {
-                codes.push(i);
+                if(i != 614) {
+                    codes.push(i);
+                }
             }
         }
         if(app.incident_checkboxes.includes("Motor Vehicle Theft")) {
@@ -159,11 +163,14 @@ function applyFilters() {
         if(app.incident_checkboxes.includes("Weapons")) {
             codes.push(2619);
         }
-        if(app.incident_checkboxes.includes("Narcotics")) {
+        if(app.incident_checkboxes.includes("Proactive Police Event")) {
             codes.push(9954);
         }
-        if(app.incident_checkboxes.includes("Narcotics")) {
+        if(app.incident_checkboxes.includes("Community Engagement Event")) {
             codes.push(9959);
+        }
+        if(app.incident_checkboxes.includes("Other")) {
+            codes.push(614);
         }
 
         params = params + "code=" + codes.join() + "&";
@@ -210,7 +217,6 @@ function applyFilters() {
         params = params + "limit=" + app.limit;
     }
 
-    console.log(params);
     if(params != "") {
         getIncidents(params);
     }
@@ -234,12 +240,11 @@ function getIncidentTypes() {
     app.incidentTypes.push("Community Engagement Event");
     app.incidentTypes.push("Other");
 
-    console.log(app.incidentTypes);
 }
 
 function addNeighborhoodPopups(){
-    let maxLon = app.$data.map.bounds.se.lon
-    let minLon = app.$data.map.bounds.nw.lon
+    let maxLon = app.$data.map.bounds.se.lng
+    let minLon = app.$data.map.bounds.nw.lng
     let maxLat = app.$data.map.bounds.nw.lat;
     let minLat = app.$data.map.bounds.se.lat;
 
@@ -263,7 +268,6 @@ function getNeighborhoods() {
         for(let i = 0; i < result.length; i++){
             neighborhoodCounts[result[i].neighborhood_number] = {name: result[i].neighborhood_name, count: 0, number: result[i].neighborhood_number, onMap: false};
         }
-        console.log(neighborhoodCounts);
     });
 }
 
@@ -284,7 +288,6 @@ function getCodes(){
             }
             app.codeResults[code] = arr;
         }
-        console.log(app.codeResults);
     });
 }
 
@@ -295,8 +298,8 @@ function getIncidents(params){
     }
 
     //only show crimes that occured in locations visible on map
-    let maxLon = app.$data.map.bounds.se.lon
-    let minLon = app.$data.map.bounds.nw.lon
+    let maxLon = app.$data.map.bounds.se.lng
+    let minLon = app.$data.map.bounds.nw.lng
     let maxLat = app.$data.map.bounds.nw.lat;
     let minLat = app.$data.map.bounds.se.lat;
 
@@ -342,12 +345,14 @@ function getJSON(url) {
 }
 //MAYBE DELETE
 function panToLocation(data){
-    console.log(data);
-    if(data != null){
+    if(data.length > 0){
         let latLong = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
         map.setZoom(16);
         map.flyTo(latLong);
         app.input = latLong.toString();
+        app.map.bounds.nw = map.getBounds().getNorthWest();
+        app.map.bounds.se = map.getBounds().getSouthEast();
+        getIncidents();
     }
 }
 
@@ -364,16 +369,19 @@ function getLatLong(input){
             //clamp
             map.setZoom(16);
             map.flyTo(latLong);
+            app.map.bounds.nw = map.getBounds().getNorthWest();
+            app.map.bounds.se = map.getBounds().getSouthEast();
+            getIncidents();
+            return;
         }
         
-    }else{
-        //address was inputted
-        splitInput[0] = input;
-        let request = {
-            url: "https://nominatim.openstreetmap.org/search?q=" + input + "&format=json&addressdetails=1",
-            dataType: "json",
-            success: panToLocation
-        };
-        $.ajax(request);
     }
+    //address was inputted
+    splitInput[0] = input;
+    let request = {
+        url: "https://nominatim.openstreetmap.org/search?q=" + input + "&format=json&addressdetails=1",
+        dataType: "json",
+        success: panToLocation
+    };
+    $.ajax(request);
 }   

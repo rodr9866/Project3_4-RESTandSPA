@@ -5,7 +5,8 @@
     "author": {
         "name": "Ricky Rodriguez",
         "email": "rodr9866@stthomas.edu"
-    },"contributors": [
+    },
+    "contributors": [
         {
             "name": "Laura Post",
             "email": "post3024@stthomas.edu"
@@ -22,7 +23,6 @@
     },
     "dependencies": {
         "express": "^4.17.1",
-        "sqlite3": "^4.1.0",
-        "node": "^15.2.1"
+        "sqlite3": "^4.1.0"
     }
 }
