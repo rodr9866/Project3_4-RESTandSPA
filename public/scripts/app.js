@@ -416,7 +416,6 @@ function addMarkerForRow(row){
         url: "https://nominatim.openstreetmap.org/search?format=json&q=" + (address + ", Saint Paul, MN").replace(" ", "%20") + "&addressdetails=1",
         dataType: "json",
         success: function(data){
-            console.log(data);
             if(data != null && data.length > 0){
                 let id = markerID;
                 markerID++;
@@ -431,7 +430,6 @@ function addMarkerForRow(row){
 }
 
 function deleteMarker(id){
-    console.log("Deleting marker at" + id);
     map.removeLayer(incidentMarkers[id]);
     delete incidentMarkers[id];
 }
